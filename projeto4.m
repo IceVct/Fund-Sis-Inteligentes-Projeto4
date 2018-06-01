@@ -17,9 +17,22 @@ dados = readtable('./winequality-red.csv', 'Delimiter', ';');
 % nos modelos a serem treinados
 labels = dados{:, 12}';
 valores = dados{:, 1:11}';
+n = length(labels);
 
 %MLP
-net = fitnet([10 10], 'trainbr');
+%traincgb
+%traincgf
+% trainoss o melhor ate agora
+
+net = fitnet([10 10 10 10 10], 'trainlm');
+net.divideFcn = 'divideint';
 [net, trainParameters] = train(net, valores, labels);
 
+% Validacoes
+testX = valores(:,trainParameters.testInd);
+testT = labels(:,trainParameters.testInd);
+testY = net(testX);
+testY = round(testY);
+performance = sum(testY == testT)/length(testT);
+geraMatConf(testT, testY, testX);
 
